@@ -10,10 +10,11 @@ from ask_sdk_model import Response
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+# Ejercicio basico
 def breathing_exercise(cycles=5, inhale_duration=4, hold_duration=4, exhale_duration=4):
     instructions = []
     instructions.append("¡Bienvenido al ejercicio de respiracion!")
-    instructions.append(f"Haremos {cycles} ciclos de respiracion. Sigue las instrucciones:")
+    instructions.append(f"Haremos {cycles} ciclos. Sigue las instrucciones:")
     
     for cycle in range(1, cycles + 1):
         instructions.append(f"\nCiclo {cycle}/{cycles}")
@@ -24,6 +25,7 @@ def breathing_exercise(cycles=5, inhale_duration=4, hold_duration=4, exhale_dura
     instructions.append("\n¡Ejercicio completado! Espero que te sientas mas relajado.")
     return " ".join(instructions)
 
+# Ejercicio 4-7-8
 def breathing_4_7_8(cycles=3):
     instructions = []
     instructions.append("Ejercicio de respiracion 4-7-8 para relajarte:")
@@ -37,6 +39,7 @@ def breathing_4_7_8(cycles=3):
     instructions.append("\n¡Ejercicio completado! Este metodo ayuda a calmar la mente y el cuerpo.")
     return " ".join(instructions)
 
+# Ejercicio en caja
 def box_breathing(cycles=4, duration=4):
     instructions = []
     instructions.append("Ejercicio de respiracion en caja (Box Breathing):")
@@ -52,6 +55,7 @@ def box_breathing(cycles=4, duration=4):
     instructions.append("\n¡Ejercicio completado! Este metodo es excelente para centrarte.")
     return " ".join(instructions)
 
+# Manejadores
 class LaunchRequestHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         return ask_utils.is_request_type("LaunchRequest")(handler_input)
@@ -59,10 +63,10 @@ class LaunchRequestHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         handler_input.attributes_manager.session_attributes.clear()  # Limpia cualquier estado previo
         speak_output = (
-            "¡Bienvenido a tu asistente de respiración! "
+            "¡Bienvenido a tu asistente de respiracion! "
             "Puedes decir: 'iniciar ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         )
-        reprompt = "¿Qué tipo de ejercicio te gustaría hacer?"
+        reprompt = "¿Que tipo de ejercicio te gustaria hacer?"
         return handler_input.response_builder.speak(speak_output).ask(reprompt).response
 
 
@@ -71,14 +75,14 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("BreathingExerciseIntent")(handler_input)
 
     def handle(self, handler_input):
-        # Obtener valores predeterminados o de los slots
+        handler_input.attributes_manager.session_attributes.clear()  # Limpia cualquier estado previo
+
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 5
         inhale_duration = int(slots["inhale_duration"].value) if slots.get("inhale_duration") and slots["inhale_duration"].value else 4
         hold_duration = int(slots["hold_duration"].value) if slots.get("hold_duration") and slots["hold_duration"].value else 4
         exhale_duration = int(slots["exhale_duration"].value) if slots.get("exhale_duration") and slots["exhale_duration"].value else 4
 
-        # Guardar el estado del ejercicio en los atributos de sesión
         session_attr = handler_input.attributes_manager.session_attributes
         session_attr["cycles"] = cycles
         session_attr["inhale_duration"] = inhale_duration
@@ -87,18 +91,11 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         session_attr["current_cycle"] = 1
 
         speak_output = (
-            f"¡Bienvenido al ejercicio de respiración! "
+            f"¡Bienvenido al ejercicio de respiracion! "
             f"Haremos {cycles} ciclos. "
             f"Primero, inhala durante {inhale_duration} segundos."
         )
-        reprompt_output = "Inhala ahora."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(reprompt_output)
-                .response
-        )
+        return handler_input.response_builder.speak(speak_output).ask("Inhala ahora.").response
 
 
 class ContinueBreathingExerciseHandler(AbstractRequestHandler):
@@ -115,23 +112,20 @@ class ContinueBreathingExerciseHandler(AbstractRequestHandler):
         exhale_duration = session_attr["exhale_duration"]
 
         if current_cycle <= cycles:
-            # Continuar con el ejercicio
             speak_output = (
                 f"Ciclo {current_cycle}/{cycles}: "
-                f"Sostén la respiración durante {hold_duration} segundos. "
+                f"Sosten la respiracion durante {hold_duration} segundos. "
                 f"Y luego, exhala durante {exhale_duration} segundos."
             )
             session_attr["current_cycle"] += 1
             return handler_input.response_builder.speak(speak_output).ask("Sigue las instrucciones.").response
         else:
-            # Finalizar el ejercicio y limpiar la sesión
             speak_output = (
-                "¡Ejercicio completado! Espero que te sientas más relajado. "
-                "¿Te gustaría hacer otro ejercicio?"
+                "¡Ejercicio completado! Espero que te sientas mas relajado. "
+                "¿Te gustaria hacer otro ejercicio?"
             )
             handler_input.attributes_manager.session_attributes.clear()
-            return handler_input.response_builder.speak(speak_output).ask("¿Cuál te gustaría intentar?").response
-
+            return handler_input.response_builder.speak(speak_output).ask("¿Cual te gustaria intentar?").response
 
 
 class BreathingIntentHandler(AbstractRequestHandler):
@@ -139,32 +133,26 @@ class BreathingIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("BreathingIntent")(handler_input)
 
     def handle(self, handler_input):
+        handler_input.attributes_manager.session_attributes.clear()  # Limpia cualquier estado previo
+
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 3
 
-        # Guardar el estado del ejercicio en los atributos de sesión
         session_attr = handler_input.attributes_manager.session_attributes
         session_attr["cycles"] = cycles
         session_attr["current_cycle"] = 1
 
         speak_output = (
-            f"Ejercicio de respiración 4-7-8 para relajarte. "
+            f"Ejercicio de respiracion 4-7-8 para relajarte. "
             f"Comenzaremos con el primer ciclo. Inhala profundamente durante 4 segundos."
         )
-        reprompt_output = "Inhala ahora."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(reprompt_output)
-                .response
-        )
+        return handler_input.response_builder.speak(speak_output).ask("Inhala ahora.").response
 
 
 class ContinueBreathing478Handler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
-        return session_attr.get("current_cycle") is not None and "cycles" in session_attr
+        return session_attr.get("current_cycle") is not None
 
     def handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
@@ -176,14 +164,12 @@ class ContinueBreathing478Handler(AbstractRequestHandler):
             session_attr["current_cycle"] += 1
             return handler_input.response_builder.speak(speak_output).ask("Sigue las instrucciones.").response
         else:
-            # Finalizar el ejercicio y limpiar la sesión
             speak_output = (
-                "¡Ejercicio completado! Espero que te sientas más relajado. "
-                "¿Te gustaría hacer otro ejercicio?"
+                "¡Ejercicio completado! Espero que te sientas mas relajado. "
+                "¿Te gustaria hacer otro ejercicio?"
             )
             handler_input.attributes_manager.session_attributes.clear()
-            return handler_input.response_builder.speak(speak_output).ask("¿Cuál te gustaría intentar?").response
-
+            return handler_input.response_builder.speak(speak_output).ask("¿Cual te gustaria intentar?").response
 
 
 class BoxBreathingIntentHandler(AbstractRequestHandler):
@@ -191,11 +177,12 @@ class BoxBreathingIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("BoxBreathingIntent")(handler_input)
 
     def handle(self, handler_input):
+        handler_input.attributes_manager.session_attributes.clear()  # Limpia cualquier estado previo
+
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 4
         duration = int(slots["duration"].value) if slots.get("duration") and slots["duration"].value else 4
 
-        # Guardar el estado del ejercicio en los atributos de sesión
         session_attr = handler_input.attributes_manager.session_attributes
         session_attr["cycles"] = cycles
         session_attr["duration"] = duration
@@ -203,23 +190,16 @@ class BoxBreathingIntentHandler(AbstractRequestHandler):
         session_attr["current_phase"] = "inhale"
 
         speak_output = (
-            f"Ejercicio de respiración en caja. Duración de cada fase: {duration} segundos. "
+            f"Ejercicio de respiracion en caja. Duracion de cada fase: {duration} segundos. "
             f"Comenzaremos con el primer ciclo. Inhala lentamente."
         )
-        reprompt_output = "Inhala ahora."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(reprompt_output)
-                .response
-        )
+        return handler_input.response_builder.speak(speak_output).ask("Inhala ahora.").response
 
 
 class ContinueBoxBreathingHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
-        return session_attr.get("current_cycle") is not None and "cycles" in session_attr
+        return session_attr.get("current_cycle") is not None
 
     def handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
@@ -230,13 +210,13 @@ class ContinueBoxBreathingHandler(AbstractRequestHandler):
 
         if current_cycle <= cycles:
             if current_phase == "inhale":
-                speak_output = f"Ciclo {current_cycle}/{cycles}: Sostén la respiración durante {duration} segundos."
+                speak_output = f"Ciclo {current_cycle}/{cycles}: Sosten la respiracion durante {duration} segundos."
                 session_attr["current_phase"] = "hold_after_inhale"
             elif current_phase == "hold_after_inhale":
                 speak_output = f"Ciclo {current_cycle}/{cycles}: Exhala lentamente durante {duration} segundos."
                 session_attr["current_phase"] = "exhale"
             elif current_phase == "exhale":
-                speak_output = f"Ciclo {current_cycle}/{cycles}: Sostén la respiración nuevamente durante {duration} segundos."
+                speak_output = f"Ciclo {current_cycle}/{cycles}: Sosten la respiracion nuevamente durante {duration} segundos."
                 session_attr["current_phase"] = "hold_after_exhale"
                 session_attr["current_cycle"] += 1
             else:
@@ -245,14 +225,12 @@ class ContinueBoxBreathingHandler(AbstractRequestHandler):
 
             return handler_input.response_builder.speak(speak_output).ask("Sigue las instrucciones.").response
         else:
-            # Finalizar el ejercicio y limpiar la sesión
             speak_output = (
-                "¡Ejercicio completado! Espero que te sientas más relajado. "
-                "¿Te gustaría hacer otro ejercicio?"
+                "¡Ejercicio completado! Espero que te sientas mas relajado. "
+                "¿Te gustaria hacer otro ejercicio?"
             )
             handler_input.attributes_manager.session_attributes.clear()
-            return handler_input.response_builder.speak(speak_output).ask("¿Cuál te gustaría intentar?").response
-
+            return handler_input.response_builder.speak(speak_output).ask("¿Cual te gustaria intentar?").response
 
 
 class HelpIntentHandler(AbstractRequestHandler):
@@ -266,13 +244,8 @@ class HelpIntentHandler(AbstractRequestHandler):
             "Por ejemplo, di 'hacer respiracion basica' o 'iniciar respiracion en caja'. "
             "¿Cual te gustaria intentar?"
         )
+        return handler_input.response_builder.speak(speak_output).ask(speak_output).response
 
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
-        )
 
 class CancelOrStopIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -283,6 +256,7 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
         speak_output = "¡Gracias por practicar respiracion conmigo! ¡Hasta pronto!"
         return handler_input.response_builder.speak(speak_output).response
 
+
 class FallbackIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
@@ -292,14 +266,8 @@ class FallbackIntentHandler(AbstractRequestHandler):
             "Lo siento, no entendi eso. Puedes decir 'ayuda' para conocer "
             "las opciones disponibles."
         )
-        reprompt = "¿Que tipo de ejercicio de respiracion te gustaria hacer?"
+        return handler_input.response_builder.speak(speak_output).ask("¿Que ejercicio deseas realizar?").response
 
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(reprompt)
-                .response
-        )
 
 class SessionEndedRequestHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -308,20 +276,20 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         return handler_input.response_builder.response
 
+
 class CatchAllExceptionHandler(AbstractExceptionHandler):
     def can_handle(self, handler_input, exception):
         return True
 
     def handle(self, handler_input, exception):
         logger.error(exception, exc_info=True)
-        speak_output = "Lo siento, hubo un problema. Por favor, intentalo de nuevo."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+        handler_input.attributes_manager.session_attributes.clear()  # Limpia la sesion en caso de error
+        speak_output = (
+            "Lo siento, hubo un problema. La sesion se reiniciara. "
+            "Puedes decir: 'iniciar ejercicio basico', 'respiracion cuatro siete ocho', o 'ejercicio en caja'."
         )
+        return handler_input.response_builder.speak(speak_output).ask("¿Que ejercicio deseas realizar?").response
+
 
 sb = SkillBuilder()
 
@@ -336,7 +304,6 @@ sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
-
 sb.add_exception_handler(CatchAllExceptionHandler())
 
 lambda_handler = sb.lambda_handler()
