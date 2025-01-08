@@ -160,7 +160,11 @@ class ContinueBreathing478Handler(AbstractRequestHandler):
         cycles = session_attr["cycles"]
 
         if current_cycle <= cycles:
-            speak_output = f"Ciclo {current_cycle}/{cycles}: Exhala completamente durante 8 segundos."
+            speak_output = (
+                f"Ciclo {current_cycle}/{cycles}: "
+                f"Sosten la respiracion durante 7 segundos. "
+                f"Y luego, exhala completamente durante 8 segundos."
+            )
             session_attr["current_cycle"] += 1
             return handler_input.response_builder.speak(speak_output).ask("Sigue las instrucciones.").response
         else:
@@ -218,8 +222,8 @@ class ContinueBoxBreathingHandler(AbstractRequestHandler):
             elif current_phase == "exhale":
                 speak_output = f"Ciclo {current_cycle}/{cycles}: Sosten la respiracion nuevamente durante {duration} segundos."
                 session_attr["current_phase"] = "hold_after_exhale"
-                session_attr["current_cycle"] += 1
-            else:
+            elif current_phase == "hold_after_exhale":
+                speak_output = f"Ciclo {current_cycle}/{cycles}: Inhala lentamente durante {duration} segundos."
                 session_attr["current_phase"] = "inhale"
                 session_attr["current_cycle"] += 1
 
