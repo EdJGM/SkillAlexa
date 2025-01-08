@@ -21,9 +21,9 @@ class LaunchRequestHandler(AbstractRequestHandler):
         speak_output = (
             "¡Bienvenido a tu asistente de respiración! "
             "Por favor, elige una opción: "
-            "1. Ejercicios de respiración, "
-            "2. Técnica Mindfulness, "
-            "3. Recordatorios Semanales."
+            "Ejercicios de respiración, "
+            "Técnica Mindfulness, "
+            "Recordatorios Semanales."
         )
         return handler_input.response_builder.speak(speak_output).ask("¿Qué opción te gustaría elegir?").response
 
@@ -37,9 +37,9 @@ class MainMenuIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         speak_output = (
             "Por favor, elige una opción: "
-            "1. Ejercicios de respiración, "
-            "2. Técnica Mindfulness, "
-            "3. Recordatorios Semanales."
+            "Ejercicios de respiración, "
+            "Técnica Mindfulness, "
+            "Recordatorios Semanales."
         )
         return handler_input.response_builder.speak(speak_output).ask("¿Qué opción te gustaría elegir?").response
 
@@ -54,9 +54,9 @@ class BreathingExercisesIntentHandler(AbstractRequestHandler):
         speak_output = (
             "Has elegido ejercicios de respiración. "
             "Por favor, elige uno: "
-            "1. Ejercicio básico, "
-            "2. Ejercicio 4-7-8, "
-            "3. Respiración en caja."
+            "Ejercicio básico, "
+            "Ejercicio 4-7-8, "
+            "Respiración en caja."
         )
         return handler_input.response_builder.speak(speak_output).ask("¿Cuál ejercicio te gustaría intentar?").response
 
