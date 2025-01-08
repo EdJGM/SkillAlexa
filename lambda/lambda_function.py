@@ -106,24 +106,46 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         return handler_input.request_envelope.request.type == "IntentRequest" and handler_input.request_envelope.request.intent.name == "BreathingExerciseIntent"
 
     def handle(self, handler_input):
-        instructions = breathing_exercise()
+        # Leer los slots
+        slots = handler_input.request_envelope.request.intent.slots
+        cycles = int(slots["cycles"].value) if "cycles" in slots and slots["cycles"].value else 5
+        inhale_duration = int(slots["inhale_duration"].value) if "inhale_duration" in slots and slots["inhale_duration"].value else 4
+        hold_duration = int(slots["hold_duration"].value) if "hold_duration" in slots and slots["hold_duration"].value else 4
+        exhale_duration = int(slots["exhale_duration"].value) if "exhale_duration" in slots and slots["exhale_duration"].value else 4
+
+        # Ejecutar el ejercicio con los valores del usuario
+        instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
         return handler_input.response_builder.speak(instructions).response
 
-class Breathing478IntentHandler(AbstractRequestHandler):
+
+class BreathingIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         return handler_input.request_envelope.request.type == "IntentRequest" and handler_input.request_envelope.request.intent.name == "Breathing478Intent"
 
     def handle(self, handler_input):
-        instructions = breathing_4_7_8()
+        # Leer los slots
+        slots = handler_input.request_envelope.request.intent.slots
+        cycles = int(slots["cycles"].value) if "cycles" in slots and slots["cycles"].value else 3
+
+        # Ejecutar el ejercicio con los valores del usuario
+        instructions = breathing_4_7_8(cycles)
         return handler_input.response_builder.speak(instructions).response
+
 
 class BoxBreathingIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         return handler_input.request_envelope.request.type == "IntentRequest" and handler_input.request_envelope.request.intent.name == "BoxBreathingIntent"
 
     def handle(self, handler_input):
-        instructions = box_breathing()
+        # Leer los slots
+        slots = handler_input.request_envelope.request.intent.slots
+        cycles = int(slots["cycles"].value) if "cycles" in slots and slots["cycles"].value else 4
+        duration = int(slots["duration"].value) if "duration" in slots and slots["duration"].value else 4
+
+        # Ejecutar el ejercicio con los valores del usuario
+        instructions = box_breathing(cycles, duration)
         return handler_input.response_builder.speak(instructions).response
+
 
 
 class HelpIntentHandler(AbstractRequestHandler):
@@ -248,7 +270,7 @@ sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(BreathingExerciseIntentHandler())
-sb.add_request_handler(Breathing478IntentHandler())
+sb.add_request_handler(BreathingIntentHandler())
 sb.add_request_handler(BoxBreathingIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
