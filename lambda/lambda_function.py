@@ -27,7 +27,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Bienvenido a la skill Respira y Relájate. ¿Qué te gustaría intentar?"
+        speak_output = ("Bienvenido a Respira y Relájate. Esta skill te ayudará a gestionar el estrés con ejercicios de respiración."
+                        "Di 'comenzar un ejercicio de respiración' para iniciar.")
 
         return (
             handler_input.response_builder
@@ -37,22 +38,56 @@ class LaunchRequestHandler(AbstractRequestHandler):
         )
 
 
-class HelloWorldIntentHandler(AbstractRequestHandler):
-    """Handler for Hello World Intent."""
+class BreathingExerciseIntentHandler(AbstractRequestHandler):
+    """Handler for Breathing Exercise Intent."""
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("HelloWorldIntent")(handler_input)
+        return ask_utils.is_intent_name("BreathingExerciseIntent")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "Hello World!"
+        speak_output = (
+            "Vamos a comenzar un ejercicio de respiración. ¿Cuánto tiempo te gustaría practicar? "
+            "Puedes decir, por ejemplo, 2 minutos o 5 minutos.")
 
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .ask(speak_output)
                 .response
         )
+        
+class SetBreathingDurationIntentHandler(AbstractRequestHandler):
+    """Handler to set the duration of the breathing exercise."""
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("SetBreathingDurationIntent")(handler_input)
+
+    def handle(self, handler_input):
+        slots = handler_input.request_envelope.request.intent.slots
+        duration = slots["duration"].value  # Duration slot captured from user input
+
+        try:
+            duration_minutes = int(duration)
+            total_seconds = duration_minutes * 60
+
+            speak_output = (f"Perfecto, practicaremos la respiración durante {duration_minutes} minutos. "
+                            "Inhalemos durante 4 segundos, mantengamos la respiración durante 7 segundos, "
+                            "y exhalemos durante 8 segundos. Comencemos.")
+
+            # Loop to simulate breathing guidance
+            for i in range(total_seconds // 19):  # Each cycle takes 19 seconds (4+7+8)
+                speak_output += (
+                    " Inhala... 1, 2, 3, 4. Mantén la respiración... 1, 2, 3, 4, 5, 6, 7. "
+                    "Exhala... 1, 2, 3, 4, 5, 6, 7, 8.")
+
+            speak_output += " ¡Bien hecho! Has completado el ejercicio. Espero que te sientas más relajado."
+
+        except ValueError:
+            speak_output = "Lo siento, no entendí la duración. Por favor di un número en minutos, como 2 o 5."
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )        
 
 
 class HelpIntentHandler(AbstractRequestHandler):
@@ -63,7 +98,9 @@ class HelpIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You can say hello to me! How can I help?"
+        speak_output = (
+            "Puedes decir 'comenzar un ejercicio de respiración' para iniciar. "
+            "Luego, elige la duración del ejercicio en minutos. ¿En qué más puedo ayudarte?")
 
         return (
             handler_input.response_builder
@@ -82,7 +119,7 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Goodbye!"
+        speak_output = "¡Adiós! Espero haberte ayudado a relajarte."
 
         return (
             handler_input.response_builder
@@ -97,12 +134,15 @@ class FallbackIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        logger.info("In FallbackIntentHandler")
-        speech = "Hmm, I'm not sure. You can say Hello or Help. What would you like to do?"
-        reprompt = "I didn't catch that. What can I help you with?"
+        speak_output = (
+            "Lo siento, no entendí eso. Por favor intenta decir 'comenzar un ejercicio de respiración'.")
 
-        return handler_input.response_builder.speak(speech).ask(reprompt).response
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
 
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
@@ -154,7 +194,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         # type: (HandlerInput, Exception) -> Response
         logger.error(exception, exc_info=True)
 
-        speak_output = "Sorry, I had trouble doing what you asked. Please try again."
+        speak_output = "Lo siento, hubo un problema. Por favor, inténtalo de nuevo."
 
         return (
             handler_input.response_builder
@@ -171,7 +211,8 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
-sb.add_request_handler(HelloWorldIntentHandler())
+sb.add_request_handler(BreathingExerciseIntentHandler())
+sb.add_request_handler(SetBreathingDurationIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
