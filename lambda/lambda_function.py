@@ -107,10 +107,19 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         slots = handler_input.request_envelope.request.intent.slots
-        cycles = int(slots["cycles"].value) if "cycles" in slots and slots["cycles"].value else 5
-        inhale_duration = int(slots["inhale_duration"].value) if "inhale_duration" in slots and slots["inhale_duration"].value else 4
-        hold_duration = int(slots["hold_duration"].value) if "hold_duration" in slots and slots["hold_duration"].value else 4
-        exhale_duration = int(slots["exhale_duration"].value) if "exhale_duration" in slots and slots["exhale_duration"].value else 4
+        cycles = slots["cycles"].value if "cycles" in slots and slots["cycles"].value else 5
+        inhale_duration = slots["inhale_duration"].value if "inhale_duration" in slots and slots["inhale_duration"].value else 4
+        hold_duration = slots["hold_duration"].value if "hold_duration" in slots and slots["hold_duration"].value else 4
+        exhale_duration = slots["exhale_duration"].value if "exhale_duration" in slots and slots["exhale_duration"].value else 4
+
+        try:
+            cycles = int(cycles)
+            inhale_duration = int(inhale_duration)
+            hold_duration = int(hold_duration)
+            exhale_duration = int(exhale_duration)
+        except ValueError:
+            speak_output = "Lo siento, no entendí los valores proporcionados. Por favor, inténtalo de nuevo."
+            return handler_input.response_builder.speak(speak_output).ask(speak_output).response
 
         instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
         return handler_input.response_builder.speak(instructions).response
