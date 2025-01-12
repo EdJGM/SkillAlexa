@@ -19,9 +19,9 @@ def breathing_exercise(cycles=5, inhale_duration=4, hold_duration=4, exhale_dura
         instructions.append(f"\nCiclo {cycle}/{cycles}:")
         instructions.append(f"Inhala durante {inhale_duration} segundos. Voy a contar: ")
         instructions.extend([f"{i}..." for i in range(1, inhale_duration + 1)])
-        instructions.append("<break time='1s'/> Sosten la respiración durante {hold_duration} segundos: ")
+        instructions.append(f"<break time='1s'/> Sosten la respiración durante {hold_duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, hold_duration + 1)])
-        instructions.append("<break time='1s'/> Exhala suavemente durante {exhale_duration} segundos: ")
+        instructions.append(f"<break time='1s'/> Exhala suavemente durante {exhale_duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, exhale_duration + 1)])
         instructions.append("<break time='1s'/>")
 
