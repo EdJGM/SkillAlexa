@@ -26,6 +26,7 @@ def breathing_exercise(cycles=5, inhale_duration=4, hold_duration=4, exhale_dura
         instructions.append("<break time='1s'/>")
 
     instructions.append("\n¡Ejercicio completado! Espero que te sientas más relajado.")
+    instructions.append("\n¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'.")
     return " ".join(instructions)
 
 # Ejercicio mejorado 4-7-8
@@ -44,6 +45,7 @@ def breathing_4_7_8(cycles=3):
         instructions.append("<break time='1s'/>")
 
     instructions.append("\n¡Ejercicio completado! Este método ayuda a calmar la mente y el cuerpo.")
+    instructions.append("\n¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'.")
     return " ".join(instructions)
 
 # Ejercicio mejorado de respiración en caja
@@ -65,6 +67,7 @@ def box_breathing(cycles=4, duration=4):
         instructions.append("<break time='1s'/>")
 
     instructions.append("\n¡Ejercicio completado! Este método es excelente para centrarte.")
+    instructions.append("\n¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'.")
     return " ".join(instructions)
 
 # Manejadores
