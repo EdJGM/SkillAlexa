@@ -56,11 +56,11 @@ def box_breathing(cycles=4, duration=4):
         instructions.append(f"\nCiclo {cycle}/{cycles}:")
         instructions.append("Inhala lentamente. Voy a contar: ")
         instructions.extend([f"{i}..." for i in range(1, duration + 1)])
-        instructions.append("<break time='1s'/> Sosten la respiración: ")
+        instructions.append(f"<break time='1s'/> Sosten la respiración durante {duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, duration + 1)])
-        instructions.append("<break time='1s'/> Exhala lentamente: ")
+        instructions.append(f"<break time='1s'/> Exhala lentamente durante {duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, duration + 1)])
-        instructions.append("<break time='1s'/> Sosten nuevamente: ")
+        instructions.append(f"<break time='1s'/> Sosten nuevamente durante {duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, duration + 1)])
         instructions.append("<break time='1s'/>")
 
@@ -97,9 +97,9 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
         return handler_input.response_builder.speak(instructions).response
 
-class Breathing478IntentHandler(AbstractRequestHandler):
+class BreathingIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
-        return ask_utils.is_intent_name("Breathing478Intent")(handler_input)
+        return ask_utils.is_intent_name("BreathingIntent")(handler_input)
 
     def handle(self, handler_input):
         # Obtén los ciclos desde los slots o usa el valor por defecto
@@ -136,13 +136,25 @@ class BreathingExercisesIntentHandler(AbstractRequestHandler):
         )
         return handler_input.response_builder.speak(speak_output).ask(speak_output).response
 
+class FallbackIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
+
+    def handle(self, handler_input):
+        speak_output = (
+            "Lo siento, no entendí eso. Puedes intentar decir: 'respiración básica', "
+            "'cuatro siete ocho' o 'respiración en caja'."
+        )
+        return handler_input.response_builder.speak(speak_output).ask(speak_output).response
+
 # Configuración del Skill Builder
 sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(BreathingExerciseIntentHandler())
-sb.add_request_handler(Breathing478IntentHandler())
+sb.add_request_handler(BreathingIntentHandler())
 sb.add_request_handler(BoxBreathingIntentHandler())
 sb.add_request_handler(BreathingExercisesIntentHandler())
+sb.add_request_handler(FallbackIntentHandler())
 
 lambda_handler = sb.lambda_handler()
