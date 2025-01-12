@@ -39,6 +39,63 @@
                     "samples": []
                 },
                 {
+                    "name": "MenuSelectionIntent",
+                    "slots": [
+                        {
+                            "name": "option",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "quiero hacer {option}",
+                        "elegir {option}",
+                        "seleccionar {option}",
+                        "ir a {option}",
+                        "iniciar {option}",
+                        "comenzar {option}",
+                        "empezar {option}",
+                        "hacer {option}",
+                        "ejercicios de respiración",
+                        "ejercicios de respiracion",
+                        "ejercicios respiratorios",
+                        "respiración",
+                        "respiracion",
+                        "ejercicios mindfulness",
+                        "mindfulness",
+                        "meditación",
+                        "meditacion",
+                        "agregar recordatorios",
+                        "recordatorios",
+                        "quiero agregar recordatorios",
+                        "quiero ejercicios de respiración",
+                        "quiero ejercicios de respiracion",
+                        "quiero ejercicios mindfulness",
+                        "quiero hacer mindfulness",
+                        "quiero hacer respiración",
+                        "quiero hacer meditación",
+                        "deseo hacer {option}",
+                        "me gustaría hacer {option}"
+                    ]
+                },
+                {
+                    "name": "ReturnToMenuIntent",
+                    "slots": [],
+                    "samples": [
+                        "regresar al menú principal",
+                        "regresar al menu principal",
+                        "volver al menú",
+                        "volver al menu",
+                        "ir al menú principal",
+                        "ir al menu principal",
+                        "menú principal",
+                        "menu principal",
+                        "regresar",
+                        "volver",
+                        "menú",
+                        "menu"
+                    ]
+                },
+                {
                     "name": "BreathingExercisesIntent",
                     "slots": [],
                     "samples": [

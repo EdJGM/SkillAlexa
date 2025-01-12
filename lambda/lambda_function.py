@@ -28,6 +28,7 @@ def breathing_exercise(cycles=5, inhale_duration=4, hold_duration=4, exhale_dura
 
     instructions.append("\n¡Ejercicio completado! Espero que te sientas más relajado.")
     instructions.append("\n¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'.")
+    instructions.append("\nO ¿Te gustaría regresar al menú principal?")
     return " ".join(instructions)
 
 # Ejercicio mejorado 4-7-8
@@ -47,6 +48,7 @@ def breathing_4_7_8(cycles=3):
 
     instructions.append("\n¡Ejercicio completado! Este método ayuda a calmar la mente y el cuerpo.")
     instructions.append("\n¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'.")
+    instructions.append("\nO ¿Te gustaría regresar al menú principal?")
     return " ".join(instructions)
 
 # Ejercicio mejorado de respiración en caja
@@ -69,6 +71,7 @@ def box_breathing(cycles=4, duration=4):
 
     instructions.append("\n¡Ejercicio completado! Este método es excelente para centrarte.")
     instructions.append("\n¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'.")
+    instructions.append("\nO ¿Te gustaría regresar al menú principal?")
     return " ".join(instructions)
 
 # Manejadores
@@ -78,10 +81,13 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         speak_output = (
-            "¡Bienvenido a tu asistente de respiración! "
-            "Puedes decir: 'iniciar ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+            "Bienvenido a Respira y Relájate. Puedes elegir entre: "
+            "Ejercicios de respiración, "
+            "Ejercicios Mindfulness, o "
+            "Agregar recordatorio. "
+            "¿Qué te gustaría hacer?"
         )
-        reprompt = "¿Qué tipo de ejercicio te gustaría hacer?"
+        reprompt = "Por favor, di qué te gustaría hacer: Ejercicios de respiración, Ejercicios Mindfulness, o Agregar recordatorios."
         return handler_input.response_builder.speak(speak_output).ask(reprompt).response
 
 class PlayBackgroundMusicHandler(AbstractRequestHandler):
@@ -104,6 +110,71 @@ class PlayBackgroundMusicHandler(AbstractRequestHandler):
         ).set_should_end_session(False)
         return handler_input.response_builder.response
 
+# Manejador de selección de menú
+class MenuSelectionHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("MenuSelectionIntent")(handler_input)
+
+    def handle(self, handler_input):
+        slots = handler_input.request_envelope.request.intent.slots
+        option = slots["option"].value if slots.get("option") and slots["option"].value else ""
+        
+        # Normalizar la entrada a minúsculas y sin acentos
+        option = option.lower().replace('ó', 'o').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ú', 'u')
+        
+        if "respiracion" in option or "respiratorio" in option or "respirar" in option:
+            speak_output = (
+                "Has seleccionado ejercicios de respiración. "
+                "Puedes elegir entre: ejercicio básico, "
+                "respiración cuatro siete ocho, o "
+                "respiración en caja. "
+                "¿Cuál te gustaría hacer?"
+            )
+            reprompt = "¿Qué ejercicio te gustaría hacer?"
+        
+        elif "mindfulness" in option or "meditacion" in option:
+            speak_output = (
+                "Has seleccionado ejercicios Mindfulness. "
+                "Esta funcionalidad estará disponible próximamente. "
+                "¿Te gustaría elegir otra opción?"
+            )
+            reprompt = "¿Te gustaría elegir otra opción?"
+        
+        elif "recordatorio" in option or "recordatorios":
+            speak_output = (
+                "Has seleccionado agregar recordatorios. "
+                "Esta funcionalidad estará disponible próximamente. "
+                "¿Te gustaría elegir otra opción?"
+            )
+            reprompt = "¿Te gustaría elegir otra opción?"
+        
+        else:
+            speak_output = (
+                "No entendí tu selección. Por favor, di qué te gustaría hacer: "
+                "Ejercicios de respiración, "
+                "Ejercicios Mindfulness, o "
+                "Agregar recordatorios."
+            )
+            reprompt = "¿Qué te gustaría hacer?"
+
+        return handler_input.response_builder.speak(speak_output).ask(reprompt).response
+
+# Manejador para regresar al menú principal
+class ReturnToMenuHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("ReturnToMenuIntent")(handler_input)
+
+    def handle(self, handler_input):
+        speak_output = (
+            "De acuerdo. Puedes elegir entre: "
+            "Ejercicios de respiración, "
+            "Ejercicios Mindfulness, o "
+            "Agregar recordatorio. "
+            "¿Qué te gustaría hacer?"
+        )
+        reprompt = "¿Qué te gustaría hacer?"
+        return handler_input.response_builder.speak(speak_output).ask(reprompt).response
+
 # Adaptar para cada ejercicio
 class BreathingExerciseIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -117,7 +188,7 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         exhale_duration = int(slots["exhale_duration"].value) if slots.get("exhale_duration") and slots["exhale_duration"].value else 4
 
         instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
-        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'. O puedes decir 'regresar al menú principal'."
         
         handler_input.response_builder.add_directive(
             PlayDirective(
@@ -143,7 +214,7 @@ class BreathingIntentHandler(AbstractRequestHandler):
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 3
 
         instructions = breathing_4_7_8(cycles)
-        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'. O puedes decir 'regresar al menú principal'."
         
         handler_input.response_builder.add_directive(
             PlayDirective(
@@ -170,7 +241,7 @@ class BoxBreathingIntentHandler(AbstractRequestHandler):
         duration = int(slots["duration"].value) if slots.get("duration") and slots["duration"].value else 4
 
         instructions = box_breathing(cycles, duration)
-        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'. O puedes decir 'regresar al menú principal'."
         
         handler_input.response_builder.add_directive(
             PlayDirective(
@@ -236,6 +307,8 @@ sb.add_request_handler(PlayBackgroundMusicHandler())
 sb.add_request_handler(BreathingExerciseIntentHandler())
 sb.add_request_handler(BreathingIntentHandler())
 sb.add_request_handler(BoxBreathingIntentHandler())
+sb.add_request_handler(MenuSelectionHandler())
+sb.add_request_handler(ReturnToMenuHandler())
 sb.add_request_handler(BreathingExercisesIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(CancelAndStopIntentHandler())
