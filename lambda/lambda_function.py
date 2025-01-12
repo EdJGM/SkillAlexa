@@ -155,8 +155,15 @@ class CancelAndStopIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         speak_output = "¡Hasta luego! Gracias por usar el asistente de respiración."
         return handler_input.response_builder.speak(speak_output).response
-        
 
+class CatchAllExceptionHandler(AbstractExceptionHandler):
+    def can_handle(self, handler_input, exception):
+        return True
+
+    def handle(self, handler_input, exception):
+        logger.error(exception, exc_info=True)
+        speak_output = "Lo siento, ha ocurrido un error. Por favor, intenta nuevamente."
+        return handler_input.response_builder.speak(speak_output).response
 
 # Configuración del Skill Builder
 sb = SkillBuilder()
@@ -168,7 +175,7 @@ sb.add_request_handler(BoxBreathingIntentHandler())
 sb.add_request_handler(BreathingExercisesIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(CancelAndStopIntentHandler())
-
+sb.add_exception_handler(CatchAllExceptionHandler())
 
 
 lambda_handler = sb.lambda_handler()
