@@ -82,47 +82,38 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
 # Adaptar para cada ejercicio
 class BreathingExerciseIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        return ask_utils.is_intent_name("BreathingExerciseIntent")(handler_input)
-
     def handle(self, handler_input):
-        # Obtén los parámetros del ejercicio desde los slots o usa valores por defecto
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 5
         inhale_duration = int(slots["inhale_duration"].value) if slots.get("inhale_duration") and slots["inhale_duration"].value else 4
         hold_duration = int(slots["hold_duration"].value) if slots.get("hold_duration") and slots["hold_duration"].value else 4
         exhale_duration = int(slots["exhale_duration"].value) if slots.get("exhale_duration") and slots["exhale_duration"].value else 4
 
-        # Genera las instrucciones mejoradas
         instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
-        return handler_input.response_builder.speak(instructions).response
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+        
+        return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
 class BreathingIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        return ask_utils.is_intent_name("BreathingIntent")(handler_input)
-
     def handle(self, handler_input):
-        # Obtén los ciclos desde los slots o usa el valor por defecto
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 3
 
-        # Genera las instrucciones mejoradas para el ejercicio 4-7-8
         instructions = breathing_4_7_8(cycles)
-        return handler_input.response_builder.speak(instructions).response
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+        
+        return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
 class BoxBreathingIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        return ask_utils.is_intent_name("BoxBreathingIntent")(handler_input)
-
     def handle(self, handler_input):
-        # Obtén los parámetros del ejercicio desde los slots o usa valores por defecto
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 4
         duration = int(slots["duration"].value) if slots.get("duration") and slots["duration"].value else 4
 
-        # Genera las instrucciones mejoradas para el ejercicio de respiración en caja
         instructions = box_breathing(cycles, duration)
-        return handler_input.response_builder.speak(instructions).response
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+        
+        return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
 class BreathingExercisesIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
