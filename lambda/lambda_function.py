@@ -124,6 +124,18 @@ class BoxBreathingIntentHandler(AbstractRequestHandler):
         instructions = box_breathing(cycles, duration)
         return handler_input.response_builder.speak(instructions).response
 
+class BreathingExercisesIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("BreathingExercisesIntent")(handler_input)
+
+    def handle(self, handler_input):
+        speak_output = (
+            "¡Claro! Puedes elegir entre los siguientes ejercicios de respiración: "
+            "'básico', 'cuatro siete ocho' o 'respiración en caja'. "
+            "¿Cuál te gustaría hacer?"
+        )
+        return handler_input.response_builder.speak(speak_output).ask(speak_output).response
+
 # Configuración del Skill Builder
 sb = SkillBuilder()
 
@@ -131,5 +143,6 @@ sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(BreathingExerciseIntentHandler())
 sb.add_request_handler(Breathing478IntentHandler())
 sb.add_request_handler(BoxBreathingIntentHandler())
+sb.add_request_handler(BreathingExercisesIntentHandler())
 
 lambda_handler = sb.lambda_handler()
