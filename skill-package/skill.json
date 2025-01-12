@@ -1,0 +1,56 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:682033474320:function:818a2452-d9a1-4f2b-bb1b-fe4ae5b3f80c:Release_0"
+        },
+        "interfaces": [],
+        "locales": {},
+        "regions": {
+          "NA": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-east-1:682033474320:function:818a2452-d9a1-4f2b-bb1b-fe4ae5b3f80c:Release_0"
+            }
+          },
+          "EU": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:eu-west-1:682033474320:function:818a2452-d9a1-4f2b-bb1b-fe4ae5b3f80c:Release_0"
+            }
+          },
+          "FE": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-west-2:682033474320:function:818a2452-d9a1-4f2b-bb1b-fe4ae5b3f80c:Release_0"
+            }
+          }
+        }
+      }
+    },
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "locales": {
+        "es-MX": {}
+      },
+      "shoppingKit": {
+        "isAmazonAssociatesOnAlexaEnabled": false,
+        "isShoppingActionsEnabled": false
+      }
+    },
+    "publishingInformation": {
+      "automaticDistribution": {
+        "isActive": false
+      },
+      "distributionCountries": [],
+      "distributionMode": "PUBLIC",
+      "isAvailableWorldwide": true,
+      "locales": {
+        "es-MX": {
+          "examplePhrases": [],
+          "keywords": [],
+          "name": "Respira y relajate"
+        }
+      },
+      "testingInstructions": "{\"ask_dist_username\":\"\",\"ask_dist_password\":\"\",\"ask_dist_testing_instructions\":\"Sample Testing Instructions.\"}"
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "respira y relajate",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": [
+                        "cancelar",
+                        "salir",
+                        "terminar"
+                    ]
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": [
+                        "ayuda",
+                        "ayudame",
+                        "que puedo hacer",
+                        "no se que hacer",
+                        "como funciona"
+                    ]
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": [
+                        "detener",
+                        "parar",
+                        "stop",
+                        "ya no mas"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "BreathingExercisesIntent",
+                    "slots": [],
+                    "samples": [
+                        "ejercicios de respiración",
+                        "quiero hacer ejercicios de respiración",
+                        "iniciar ejercicios de respiración",
+                        "empezar ejercicios de respiración"
+                    ]
+                },
+                {
+                    "name": "BreathingExerciseIntent",
+                    "slots": [
+                        {
+                            "name": "cycles",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "inhale_duration",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "hold_duration",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "exhale_duration",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "iniciar ejercicio basico",
+                        "empezar ejercicio basico",
+                        "ejercicio basico",
+                        "respiracion basica",
+                        "quiero hacer respiracion basica",
+                        "empezar respiracion basica",
+                        "iniciar respiracion basica",
+                        "respiracion basica con {cycles} ciclos",
+                        "ejercicio basico con {cycles} ciclos",
+                        "quiero hacer {cycles} ciclos de respiracion basica",
+                        "respiracion basica por {cycles} ciclos",
+                        "hacer {cycles} ciclos de respiracion basica",
+                        "respirar por {cycles} ciclos",
+                        "ejercicio basico con {inhale_duration} segundos para inhalar {hold_duration} para mantener y {exhale_duration} para exhalar",
+                        "respiracion con {inhale_duration} {hold_duration} {exhale_duration} segundos"
+                    ]
+                },
+                {
+                    "name": "BreathingIntent",
+                    "slots": [
+                        {
+                            "name": "cycles",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "respiracion cuatro siete ocho",
+                        "respiración cuatro siete ocho",
+                        "ejercicio cuatro siete ocho",
+                        "iniciar cuatro siete ocho",
+                        "empezar cuatro siete ocho",
+                        "quiero hacer cuatro siete ocho",
+                        "iniciar respiracion cuatro siete ocho",
+                        "empezar respiracion cuatro siete ocho",
+                        "respiracion cuatro siete ocho con {cycles} ciclos",
+                        "hacer {cycles} ciclos de cuatro siete ocho",
+                        "cuatro siete ocho por {cycles} ciclos",
+                        "ejercicio cuatro siete ocho con {cycles} ciclos"
+                    ]
+                },
+                {
+                    "name": "BoxBreathingIntent",
+                    "slots": [
+                        {
+                            "name": "cycles",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "duration",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "respiracion en caja",
+                        "respiración en caja",
+                        "ejercicio en caja",
+                        "box breathing",
+                        "iniciar respiracion en caja",
+                        "empezar respiracion en caja",
+                        "quiero hacer respiracion en caja",
+                        "respiracion en caja con {duration} segundos",
+                        "respiracion en caja por {cycles} ciclos",
+                        "hacer {cycles} ciclos de respiracion en caja",
+                        "box breathing con {cycles} ciclos",
+                        "respiracion en caja con {duration} segundos por fase",
+                        "ejercicio en caja por {cycles} ciclos de {duration} segundos"
+                    ]
+                },
+                {
+                    "name": "ReadyIntent",
+                    "slots": [],
+                    "samples": [
+                        "listo",
+                        "ya",
+                        "siguiente",
+                        "continuar",
+                        "ok",
+                        "bien"
+                    ]
+                },
+                {
+                    "name": "AMAZON.PauseIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ResumeIntent",
+                    "samples": []
+                }
+            ],
+            "types": []
+        }
+    }
+}
