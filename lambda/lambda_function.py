@@ -90,7 +90,7 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         exhale_duration = int(slots["exhale_duration"].value) if slots.get("exhale_duration") and slots["exhale_duration"].value else 4
 
         instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
-        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         
         return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
@@ -100,7 +100,7 @@ class BreathingIntentHandler(AbstractRequestHandler):
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 3
 
         instructions = breathing_4_7_8(cycles)
-        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         
         return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
@@ -111,7 +111,7 @@ class BoxBreathingIntentHandler(AbstractRequestHandler):
         duration = int(slots["duration"].value) if slots.get("duration") and slots["duration"].value else 4
 
         instructions = box_breathing(cycles, duration)
-        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio básico', 'respiración cuatro siete ocho' o 'ejercicio en caja'."
+        reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         
         return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
