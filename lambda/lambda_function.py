@@ -5,6 +5,7 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
+from ask_sdk_model.interfaces.audioplayer import PlayDirective, PlayBehavior, AudioItem, Stream
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -83,6 +84,26 @@ class LaunchRequestHandler(AbstractRequestHandler):
         reprompt = "¿Qué tipo de ejercicio te gustaría hacer?"
         return handler_input.response_builder.speak(speak_output).ask(reprompt).response
 
+class PlayBackgroundMusicHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("PlayBackgroundMusicIntent")(handler_input)
+
+    def handle(self, handler_input):
+        audio_url = "https://www.dropbox.com/scl/fi/o0ucgmmpzv4zfoewnv1sn/718704__muyo5438__atmospheric-landscape-for-meditation-relaxation-and-yoga.mp3?rlkey=svedxtfoezpcg88qxxgixav2r&st=2leafyic&dl=1"
+        handler_input.response_builder.add_directive(
+            PlayDirective(
+                play_behavior=PlayBehavior.REPLACE_ALL,
+                audio_item=AudioItem(
+                    stream=Stream(
+                        token="background_music",
+                        url=audio_url,
+                        offset_in_milliseconds=0
+                    )
+                )
+            )
+        ).set_should_end_session(False)
+        return handler_input.response_builder.response
+
 # Adaptar para cada ejercicio
 class BreathingExerciseIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -98,7 +119,20 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         instructions = breathing_exercise(cycles, inhale_duration, hold_duration, exhale_duration)
         reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         
-        return handler_input.response_builder.speak(instructions).ask(reprompt).response
+        handler_input.response_builder.add_directive(
+            PlayDirective(
+                play_behavior=PlayBehavior.REPLACE_ALL,
+                audio_item=AudioItem(
+                    stream=Stream(
+                        token="background_music",
+                        url="https://www.dropbox.com/scl/fi/o0ucgmmpzv4zfoewnv1sn/718704__muyo5438__atmospheric-landscape-for-meditation-relaxation-and-yoga.mp3?rlkey=svedxtfoezpcg88qxxgixav2r&st=2leafyic&dl=1",
+                        offset_in_milliseconds=0
+                    )
+                )
+            )
+        ).speak(instructions).ask(reprompt)
+        
+        return handler_input.response_builder.response
 
 class BreathingIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -111,7 +145,20 @@ class BreathingIntentHandler(AbstractRequestHandler):
         instructions = breathing_4_7_8(cycles)
         reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         
-        return handler_input.response_builder.speak(instructions).ask(reprompt).response
+        handler_input.response_builder.add_directive(
+            PlayDirective(
+                play_behavior=PlayBehavior.REPLACE_ALL,
+                audio_item=AudioItem(
+                    stream=Stream(
+                        token="background_music",
+                        url="https://www.dropbox.com/scl/fi/o0ucgmmpzv4zfoewnv1sn/718704__muyo5438__atmospheric-landscape-for-meditation-relaxation-and-yoga.mp3?rlkey=svedxtfoezpcg88qxxgixav2r&st=2leafyic&dl=1",
+                        offset_in_milliseconds=0
+                    )
+                )
+            )
+        ).speak(instructions).ask(reprompt)
+        
+        return handler_input.response_builder.response
 
 class BoxBreathingIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -125,7 +172,20 @@ class BoxBreathingIntentHandler(AbstractRequestHandler):
         instructions = box_breathing(cycles, duration)
         reprompt = "¿Te gustaría hacer otro ejercicio? Puedes elegir entre 'ejercicio basico', 'respiracion cuatro siete ocho' o 'ejercicio en caja'."
         
-        return handler_input.response_builder.speak(instructions).ask(reprompt).response
+        handler_input.response_builder.add_directive(
+            PlayDirective(
+                play_behavior=PlayBehavior.REPLACE_ALL,
+                audio_item=AudioItem(
+                    stream=Stream(
+                        token="background_music",
+                        url="https://www.dropbox.com/scl/fi/o0ucgmmpzv4zfoewnv1sn/718704__muyo5438__atmospheric-landscape-for-meditation-relaxation-and-yoga.mp3?rlkey=svedxtfoezpcg88qxxgixav2r&st=2leafyic&dl=1",
+                        offset_in_milliseconds=0
+                    )
+                )
+            )
+        ).speak(instructions).ask(reprompt)
+        
+        return handler_input.response_builder.response
 
 class BreathingExercisesIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -172,6 +232,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
+sb.add_request_handler(PlayBackgroundMusicHandler())
 sb.add_request_handler(BreathingExerciseIntentHandler())
 sb.add_request_handler(BreathingIntentHandler())
 sb.add_request_handler(BoxBreathingIntentHandler())
