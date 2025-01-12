@@ -147,6 +147,17 @@ class FallbackIntentHandler(AbstractRequestHandler):
         )
         return handler_input.response_builder.speak(speak_output).ask(speak_output).response
 
+class CancelAndStopIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
+                ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
+
+    def handle(self, handler_input):
+        speak_output = "¡Hasta luego! Gracias por usar el asistente de respiración."
+        return handler_input.response_builder.speak(speak_output).response
+        
+
+
 # Configuración del Skill Builder
 sb = SkillBuilder()
 
@@ -156,5 +167,8 @@ sb.add_request_handler(BreathingIntentHandler())
 sb.add_request_handler(BoxBreathingIntentHandler())
 sb.add_request_handler(BreathingExercisesIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
+sb.add_request_handler(CancelAndStopIntentHandler())
+
+
 
 lambda_handler = sb.lambda_handler()
