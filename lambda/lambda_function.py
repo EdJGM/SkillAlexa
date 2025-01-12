@@ -82,6 +82,9 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
 # Adaptar para cada ejercicio
 class BreathingExerciseIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("BreathingExerciseIntent")(handler_input)
+
     def handle(self, handler_input):
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 5
@@ -95,6 +98,9 @@ class BreathingExerciseIntentHandler(AbstractRequestHandler):
         return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
 class BreathingIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("BreathingIntent")(handler_input)
+
     def handle(self, handler_input):
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 3
@@ -105,6 +111,9 @@ class BreathingIntentHandler(AbstractRequestHandler):
         return handler_input.response_builder.speak(instructions).ask(reprompt).response
 
 class BoxBreathingIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("BoxBreathingIntent")(handler_input)
+
     def handle(self, handler_input):
         slots = handler_input.request_envelope.request.intent.slots
         cycles = int(slots["cycles"].value) if slots.get("cycles") and slots["cycles"].value else 4
