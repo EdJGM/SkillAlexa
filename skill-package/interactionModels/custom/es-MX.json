@@ -195,6 +195,52 @@
                     ]
                 },
                 {
+                    "name": "MindfulnessMenuIntent",
+                    "slots": [],
+                    "samples": [
+                        "quiero ejercicios mindfulness",
+                        "mindfulness",
+                        "ejercicios de mindfulness",
+                        "menu de mindfulness",
+                        "mostrar ejercicios mindfulness",
+                        "quiero hacer mindfulness"
+                    ]
+                },
+                {
+                    "name": "BodyScanIntent",
+                    "slots": [],
+                    "samples": [
+                        "quiero hacer escaneo corporal",
+                        "iniciar escaneo corporal",
+                        "escaneo corporal",
+                        "hacer escaneo corporal"
+                    ]
+                },
+                {
+                    "name": "MindfulnessObservationIntent",
+                    "slots": [],
+                    "samples": [
+                        "quiero hacer atención plena",
+                        "quiero hacer atencion plena",
+                        "iniciar atención plena",
+                        "iniciar atencion plena",
+                        "atención plena",
+                        "atencion plena",
+                        "hacer atención plena",
+                        "hacer atencion plena"
+                    ]
+                },
+                {
+                    "name": "GratitudeIntent",
+                    "slots": [],
+                    "samples": [
+                        "quiero hacer gratitud",
+                        "iniciar gratitud",
+                        "ejercicio de gratitud",
+                        "hacer gratitud"
+                    ]
+                },
+                {
                     "name": "ReadyIntent",
                     "slots": [],
                     "samples": [
