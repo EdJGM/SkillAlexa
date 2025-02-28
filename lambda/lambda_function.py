@@ -1,14 +1,28 @@
 import logging
+import os
+import boto3
+import datetime
+from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 import ask_sdk_core.utils as ask_utils
-from ask_sdk_core.skill_builder import SkillBuilder
+from ask_sdk_core.skill_builder import CustomSkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
+from ask_sdk_core.utils import is_request_type, is_intent_name
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 from ask_sdk_model.interfaces.audioplayer import PlayDirective, PlayBehavior, AudioItem, Stream
+from ask_sdk_core.dispatch_components import AbstractRequestHandler
+from ask_sdk_core.utils import is_intent_name
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+# conexión a db
+ddb_region = os.environ.get('DYNAMODB_PERSISTENCE_REGION')
+ddb_table_name = os.environ.get('DYNAMODB_PERSISTENCE_TABLE_NAME')
+ddb_resource = boto3.resource('dynamodb', region_name=ddb_region)
+dynamodb_adapter = DynamoDbAdapter(table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource)
+dynamodb = boto3.client('dynamodb', region_name='us-east-1')
 
 # URLs de las músicas
 MUSIC_URLS = [
@@ -25,7 +39,7 @@ def breathing_exercise(cycles=5, inhale_duration=4, hold_duration=4, exhale_dura
 
     for cycle in range(1, cycles + 1):
         instructions.append(f"\nCiclo {cycle}/{cycles}:")
-        instructions.append(f"Inhala durante {inhale_duration} segundos. Voy a contar: ")
+        instructions.append(f"Respira durante {inhale_duration} segundos. Voy a contar: ")
         instructions.extend([f"{i}..." for i in range(1, inhale_duration + 1)])
         instructions.append(f"<break time='1s'/> Sosten la respiración durante {hold_duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, hold_duration + 1)])
@@ -45,7 +59,7 @@ def breathing_4_7_8(cycles=3):
 
     for cycle in range(1, cycles + 1):
         instructions.append(f"\nCiclo {cycle}/{cycles}:")
-        instructions.append("Inhala profundamente durante 4 segundos. Voy a contar: ")
+        instructions.append("Respira profundamente durante 4 segundos. Voy a contar: ")
         instructions.extend([f"{i}..." for i in range(1, 5)])
         instructions.append("<break time='1s'/> Sosten la respiración durante 7 segundos: ")
         instructions.extend([f"{i}..." for i in range(1, 8)])
@@ -66,7 +80,7 @@ def box_breathing(cycles=4, duration=4):
 
     for cycle in range(1, cycles + 1):
         instructions.append(f"\nCiclo {cycle}/{cycles}:")
-        instructions.append("Inhala lentamente. Voy a contar: ")
+        instructions.append("Respira lentamente. Voy a contar: ")
         instructions.extend([f"{i}..." for i in range(1, duration + 1)])
         instructions.append(f"<break time='1s'/> Sosten la respiración durante {duration} segundos: ")
         instructions.extend([f"{i}..." for i in range(1, duration + 1)])
@@ -85,44 +99,56 @@ def box_breathing(cycles=4, duration=4):
 # Escaneo Corporal
 def body_scan_exercise():
     return (
-        "<speak> Bienvenido al ejercicio de escaneo corporal. Cierra los ojos si te sientes cómodo. "
-        "Relájate y lleva tu atención a cada parte de tu cuerpo. Comenzamos con tu cabeza y rostro, luego "
-        "tu cuello y hombros, tus brazos y manos, tu pecho y abdomen, tu espalda, tus caderas y piernas, y finalmente tus pies. "
-        "Respira profundamente y lleva tu atención a todo tu cuerpo. <break time='1s'/> ¡Bien hecho! Has completado el ejercicio. "
+        "<speak> Bienvenido al ejercicio de escaneo corporal. Vamos a tomarnos un momento para conectar con nuestro cuerpo y relajarnos profundamente. "
+        "Cierra los ojos si te sientes cómodo y lleva tu atención a tu respiración. Inhala profundamente y exhala suavemente. "
+        "<break time='4s'/> Comencemos. Lleva tu atención a tu cabeza y rostro. Nota cualquier sensación, tensión o relajación en esta área. "
+        "<break time='6s'/> Ahora enfócate en tu cuello y hombros. Permíteles relajarse mientras respiras profundamente. "
+        "<break time='6s'/> Continúa bajando tu atención a tus brazos y manos. Nota cómo se sienten. ¿Están relajados o tensos? "
+        "<break time='6s'/> Lleva tu atención a tu pecho y abdomen. Observa el ritmo de tu respiración y cómo tu cuerpo se mueve con cada inhalación y exhalación. "
+        "<break time='6s'/> Ahora siente tu espalda, desde la parte superior hasta la parte baja. Relaja cualquier tensión que puedas sentir. "
+        "<break time='6s'/> Enfócate en tus caderas, piernas y pies. Nota cómo se sienten apoyados sobre el suelo o la superficie donde estás sentado. "
+        "<break time='6s'/> Finalmente, lleva tu atención a todo tu cuerpo. Siente cómo cada parte está conectada. Respira profundamente y disfruta de este momento de calma. "
+        "<break time='6s'/> ¡Bien hecho! Has completado el ejercicio de escaneo corporal. "
         "¿Te gustaría hacer otro ejercicio o regresar al menú principal? </speak>"
     )
+
 
 # Atención Plena
 def mindfulness_observation():
     return (
-        "<speak> Bienvenido al ejercicio de atención plena. Observa tu entorno y piensa en tres cosas que puedes ver, "
-        "tres cosas que puedes escuchar y tres cosas que puedes sentir. Reflexiona sobre tus respuestas. <break time='1s'/> "
-        "¡Bien hecho! Has completado el ejercicio de atención plena. ¿Te gustaría hacer otro ejercicio o regresar al menú principal? </speak>"
+        "<speak> Bienvenido al ejercicio de atención plena. Vamos a tomarnos un momento para observar nuestro entorno y conectar con el presente. "
+        "<break time='1s'/> Primero, mira a tu alrededor. Nota tres cosas que puedes ver. Pueden ser objetos, colores o detalles que antes no habías notado. "
+        "<break time='6s'/> Ahora, cierra los ojos si te sientes cómodo y presta atención a los sonidos a tu alrededor. "
+        "Identifica tres sonidos diferentes. Tal vez puedas escuchar el sonido de tu respiración, el viento, o incluso algún ruido distante. "
+        "<break time='8s'/> Por último, enfócate en lo que puedes sentir en tu cuerpo. Nota tres sensaciones físicas. "
+        "Podría ser la temperatura del aire en tu piel, la sensación de la ropa en tu cuerpo, o cómo tus pies tocan el suelo. "
+        "<break time='8s'/> Respira profundamente y toma un momento para apreciar esta conexión con el presente. "
+        "<break time='5s'/> ¡Bien hecho! Has completado este ejercicio de atención plena. "
+        "¿Te gustaría hacer otro ejercicio o regresar al menú principal? </speak>"
     )
 
 # Gratitud
 def gratitude_exercise():
     return (
-        "<speak> Bienvenido al ejercicio de gratitud. Reflexiona sobre tu día y piensa en tres cosas por las que te sientes agradecido. "
-        "Dedica un momento a apreciar estas cosas. <break time='1s'/> ¡Bien hecho! Has completado el ejercicio de gratitud. "
+        "<speak> Bienvenido al ejercicio de gratitud. Vamos a reflexionar sobre tres cosas por las que te sientas agradecido el día de hoy. "
+        "<break time='1s'/> Primero, piensa en algo que haya sucedido hoy que te hizo sonreír o sentir bien. "
+        "<break time='5s'/> Ahora, reflexiona sobre una persona en tu vida a quien aprecias. "
+        "<break time='5s'/> Por último, piensa en algo simple pero importante, como un lugar que disfrutes, una comida que te guste, o incluso un momento de tranquilidad. "
+        "<break time='5s'/> Tómate un momento para sentirte agradecido por estas tres cosas. "
+        "<break time='10s'/> La gratitud nos ayuda a enfocarnos en lo positivo y mejora nuestro bienestar emocional. "
+        "<break time='1s'/> ¡Bien hecho! Has completado este ejercicio de gratitud. "
         "¿Te gustaría hacer otro ejercicio o regresar al menú principal? </speak>"
     )
 
 # Manejadores
+# Manejador para la bienvenida y selección del test
 class LaunchRequestHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
-        return ask_utils.is_request_type("LaunchRequest")(handler_input)
+        return is_request_type("LaunchRequest")(handler_input)
 
     def handle(self, handler_input):
-        speak_output = (
-            "Bienvenido a Respira y Relájate. Puedes elegir entre: "
-            "Ejercicios de respiración, "
-            "Ejercicios Mindfulness, o "
-            "Agregar recordatorio. "
-            "¿Qué te gustaría hacer?"
-        )
-        reprompt = "Por favor, di qué te gustaría hacer: Ejercicios de respiración, Ejercicios Mindfulness, o Agregar recordatorios."
-
+        speak_output = "Bienvenido a Respira y Relájate. Puedes elegir entre el test de estrés o el test de bienestar emocional. O si ya hiciste algún test puedes pasar directamente a los ejercicios diciendo 'menu principal'. ¿Cuál prefieres?"
+        
         # Inicia la música desde la primera pista
         handler_input.response_builder.add_directive(
             PlayDirective(
@@ -138,7 +164,172 @@ class LaunchRequestHandler(AbstractRequestHandler):
             )
         )
         
-        return handler_input.response_builder.speak(speak_output).ask(reprompt).response
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(speak_output)
+                .response
+        )
+
+# Manejador para las preguntas
+class SelectTestIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("SelectTestIntent")(handler_input)
+
+    def handle(self, handler_input):
+        slots = handler_input.request_envelope.request.intent.slots
+        test_type = slots["testType"].value.lower() if slots and slots.get("testType") and slots["testType"].value else None
+
+        # Obtener el attributes manager y los atributos persistentes
+        attributes_manager = handler_input.attributes_manager
+        # Inicializar los atributos persistentes si no existen
+        persistent_attributes = attributes_manager.persistent_attributes
+        if not persistent_attributes:
+            persistent_attributes = {}
+
+        if test_type == "estrés" or test_type == "estres":
+            persistent_attributes["current_test"] = "stress"
+            persistent_attributes["stress_questions"] = [
+                "¿Te sientes abrumado(a) por tus responsabilidades?",
+                "¿Tienes dificultad para dormir por preocupaciones?",
+                "¿Te sientes irritable o frustrado(a) con frecuencia?",
+                "¿Sientes que no tienes tiempo suficiente para ti mismo(a)?",
+                "¿Te resulta difícil concentrarte en tus tareas diarias?",
+                "¿Te preocupa tu salud física o mental?",
+                "¿Sientes que tu vida está fuera de control?",
+                "¿Te sientes solo(a) o aislado(a) en tus problemas?",
+                "¿Te cuesta disfrutar de las cosas que antes te hacían feliz?",
+                "¿Experimentas síntomas físicos como dolores de cabeza o tensión muscular?"
+            ]
+            persistent_attributes["stress_answers"] = []
+            persistent_attributes["current_question_index"] = 0
+
+        elif test_type == "bienestar emocional":
+            persistent_attributes["current_test"] = "wellbeing"
+            persistent_attributes["wellbeing_questions"] = [
+                "¿Te sientes feliz en tu vida cotidiana?",
+                "¿Tienes relaciones satisfactorias con amigos y familiares?",
+                "¿Te sientes motivado(a) para alcanzar tus metas?",
+                "¿Eres capaz de manejar los desafíos que enfrentas?",
+                "¿Sientes que tienes un propósito en la vida?",
+                "¿Te sientes agradecido(a) por lo que tienes?",
+                "¿Te tomas tiempo para ti mismo(a) regularmente?",
+                "¿Disfrutas de actividades que te hacen sentir bien?",
+                "¿Sientes que puedes expresar tus emociones de manera saludable?",
+                "¿Te sientes optimista sobre el futuro?"
+            ]
+            persistent_attributes["wellbeing_answers"] = []
+            persistent_attributes["current_question_index"] = 0
+
+        else:
+            speak_output = "No entendí el tipo de test que quieres hacer. Por favor elige entre 'estrés' o 'bienestar emocional'."
+            return (
+                handler_input.response_builder
+                    .speak(speak_output)
+                    .ask(speak_output)
+                    .response
+            )
+
+        # Guardar los atributos actualizados
+        attributes_manager.persistent_attributes = persistent_attributes
+        attributes_manager.save_persistent_attributes()
+
+        # Obtener la primera pregunta
+        current_test = persistent_attributes["current_test"]
+        first_question = persistent_attributes[f"{current_test}_questions"][0]
+
+        speak_output = f"Has elegido el test de {test_type}. {first_question}"
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .ask(first_question)
+                .response
+        )
+
+# Manejador para respuestas
+class YesIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.YesIntent")(handler_input)
+
+    def handle(self, handler_input):
+        return AnswerProcessor.handle_test_response(handler_input, "si")
+
+
+class NoIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.NoIntent")(handler_input)
+
+    def handle(self, handler_input):
+        return AnswerProcessor.handle_test_response(handler_input, "no")
+
+class AnswerProcessor:
+    @staticmethod
+    def handle_test_response(handler_input, user_response):
+        try:
+            attributes_manager = handler_input.attributes_manager
+            persistent_attributes = attributes_manager.persistent_attributes
+            
+            if not persistent_attributes or "current_test" not in persistent_attributes:
+                speak_output = "Lo siento, necesitas elegir primero un test. ¿Te gustaría hacer el test de estrés o el de bienestar emocional?"
+                return handler_input.response_builder.speak(speak_output).ask(speak_output).response
+                
+            current_test = persistent_attributes["current_test"]
+            current_index = int(persistent_attributes.get("current_question_index", 0))
+            answers_key = f"{current_test}_answers"
+            questions_key = f"{current_test}_questions"
+
+            if answers_key not in persistent_attributes:
+                persistent_attributes[answers_key] = []
+            persistent_attributes[answers_key].append(user_response)
+            persistent_attributes["current_question_index"] = current_index + 1
+
+            attributes_manager.persistent_attributes = persistent_attributes
+            attributes_manager.save_persistent_attributes()
+
+            if current_index + 1 < len(persistent_attributes[questions_key]):
+                next_question = persistent_attributes[questions_key][current_index + 1]
+                return handler_input.response_builder.speak(next_question).ask(next_question).response
+
+            # Analizar resultados
+            yes_count = persistent_attributes[answers_key].count("si")
+            timestamp = datetime.datetime.utcnow().isoformat() + "Z"  # Timestamp en formato ISO8601
+            if current_test == "stress":
+                if yes_count <= 3:
+                    speak_output = "Tienes un bajo nivel de estrés. Te recomiendo realizar ejercicios de respiración básica."
+                elif yes_count <= 6:
+                    speak_output = "Tienes un nivel moderado de estrés. Puedes intentar el ejercicio de respiración 4-7-8."
+                else:
+                    speak_output = "Tienes un alto nivel de estrés. Te sugiero hacer el ejercicio de respiración en caja."
+            else:
+                if yes_count <= 3:
+                    speak_output = "Tienes un bajo bienestar emocional. Considera realizar ejercicios de gratitud."
+                elif yes_count <= 6:
+                    speak_output = "Tienes un bienestar emocional moderado. Puedes intentar ejercicios de atención plena."
+                else:
+                    speak_output = "Tienes un alto bienestar emocional. Sigue manteniendo tus hábitos saludables."
+
+            # **Actualizar test_history sin sobrescribir los datos anteriores**
+            if "test_history" not in persistent_attributes:
+                persistent_attributes["test_history"] = []
+
+            # Agregar nuevo resultado a la lista de test_history
+            persistent_attributes["test_history"].append({
+                "test_type": current_test,
+                "score": yes_count,
+                "timestamp": timestamp
+            })
+
+            # Guardar en DynamoDB
+            attributes_manager.persistent_attributes = persistent_attributes
+            attributes_manager.save_persistent_attributes()
+
+            return handler_input.response_builder.speak(speak_output + ". Ingresa al menú principal para realizar lo sugerido.").ask("Di 'menú principal' para continuar.").response
+
+        except Exception as e:
+            logger.error(f"Error en handle_test_response: {str(e)}", exc_info=True)
+            return handler_input.response_builder.speak("Lo siento, ha ocurrido un error. Intenta nuevamente.").response
+    
+
 
 class AudioPlaybackFinishedHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -200,19 +391,23 @@ class MenuSelectionHandler(AbstractRequestHandler):
             reprompt = "¿Te gustaría elegir otra opción?"
         
         elif "recordatorio" in option or "recordatorios":
-            speak_output = (            
-                "Has seleccionado agregar recordatorios. "
-                "Esta funcionalidad estará disponible próximamente. "
-                "¿Te gustaría elegir otra opción?"
-            )
-            reprompt = "¿Te gustaría elegir otra opción?"
+            # Redirige al sistema nativo de recordatorios
+            return handler_input.response_builder.add_directive({
+                "type": "Dialog.DelegateRequest",
+                "target": "AMAZON.Reminders",
+                "period": None,
+                "updatedIntent": {
+                    "name": "AMAZON.Reminders",
+                    "confirmationStatus": "NONE"
+                }
+            }).response
         
         else:
             speak_output = (
                 "No entendí tu selección. Por favor, di qué te gustaría hacer: "
                 "Ejercicios de respiración, "
                 "Ejercicios Mindfulness, o "
-                "Agregar recordatorios."
+                "Recordatorios."
             )
             reprompt = "¿Qué te gustaría hacer?"
 
@@ -228,7 +423,7 @@ class ReturnToMenuHandler(AbstractRequestHandler):
             "De acuerdo. Puedes elegir entre: "
             "Ejercicios de respiración, "
             "Ejercicios Mindfulness, o "
-            "Agregar recordatorio. "
+            "Recordatorios. "
             "¿Qué te gustaría hacer?"
         )
         reprompt = "¿Qué te gustaría hacer?"
@@ -359,9 +554,12 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         return handler_input.response_builder.speak(speak_output).response
 
 # Configuración del Skill Builder
-sb = SkillBuilder()
+sb = CustomSkillBuilder(persistence_adapter = dynamodb_adapter)
 
 sb.add_request_handler(LaunchRequestHandler())
+sb.add_request_handler(SelectTestIntentHandler())
+sb.add_request_handler(YesIntentHandler())
+sb.add_request_handler(NoIntentHandler())
 sb.add_request_handler(AudioPlaybackFinishedHandler())
 sb.add_request_handler(BreathingExerciseIntentHandler())
 sb.add_request_handler(BreathingIntentHandler())

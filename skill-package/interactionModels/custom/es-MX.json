@@ -241,6 +241,38 @@
                     ]
                 },
                 {
+                    "name": "AMAZON.YesIntent",
+                    "samples": [
+                        "sí",
+                        "si",
+                        "correcto",
+                        "afirmativo"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NoIntent",
+                    "samples": [
+                        "no",
+                        "negativo",
+                        "para nada"
+                    ]
+                },
+                {
+                    "name": "SelectTestIntent",
+                    "slots": [
+                        {
+                            "name": "testType",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "quiero hacer el test de {testType}",
+                        "elijo {testType}",
+                        "quiero {testType}",
+                        "seleccionar {testType}"
+                    ]
+                },
+                {
                     "name": "ReadyIntent",
                     "slots": [],
                     "samples": [
